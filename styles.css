@@ -9,6 +9,38 @@ body {
     margin: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: left;
 }
 
+header {
+    align-self: center;
+}
+main {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    flex-wrap: nowrap;
+}
+
+#leftbox {
+    color: hsl(119, 71%, 81%);
+    flex-direction: column;
+    align-items: left;
+}
+#rightbox {
+    background-color: hsl(241, 71%, 81%);
+    flex-direction: column;
+    align-items: center;
+}
+#choosecsv {
+    background-color: hsl(73, 45%, 48%);
+}
+
+#chooseYvariable {
+    color: hsl(27, 35%, 50%);
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
