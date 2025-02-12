@@ -23,11 +23,13 @@ main {
 }
 
 #leftbox {
+    display: flex;
     color: hsl(119, 71%, 81%);
     flex-direction: column;
     align-items: left;
 }
 #rightbox {
+    display: flex;
     background-color: hsl(241, 71%, 81%);
     flex-direction: column;
     align-items: center;
@@ -40,7 +42,20 @@ main {
     color: hsl(27, 35%, 50%);
 }
 
-p {
+.parameter{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.parameter_value {
+    color: black;
+    font-size: 1em;
+    font-weight: 300;
+    margin: 0;
+    padding: 0;
+}
+
+.parameter_check{
     margin: 0;
     padding: 0;
 }

@@ -1,10 +1,21 @@
-const jsonObject = {};
-document.getElementById("csvFile").addEventListener("change", function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+//Global constants
+const parameters = document.querySelector("#parameters");
 
+//Read csv
+document.getElementById("csvFile").addEventListener("change", async function(event) {
+    const file = event.target.files[0];
+    csvAsJson = await readCsv(file);
+    displayParameters(csvAsJson);
+    
+});
+
+async function readCsv(file)   {
+    return new Promise((resolve, reject) => {
+    if (!file) return;
+    
     const reader = new FileReader();
-    reader.onload = function(e) {
+    const csvAsJson = {}
+    reader.onload = async function(e) {
         const text = e.target.result;
         const lines = text.split("\n").map(line => line.trim()).filter(line => line); // Remove empty lines
         if (lines.length < 2) return; // Ensure we have at least a header + one row
@@ -14,7 +25,7 @@ document.getElementById("csvFile").addEventListener("change", function(event) {
 
         // Initialize keys with empty arrays
         headers.forEach(header => {
-            jsonObject[header] = [];
+            csvAsJson[header] = [];
         });
 
         // Process each row
@@ -23,12 +34,42 @@ document.getElementById("csvFile").addEventListener("change", function(event) {
             
             // Add each value to its corresponding key
             headers.forEach((header, index) => {
-                jsonObject[header].push(values[index] || ""); // Handle missing values
+                csvAsJson[header].push(values[index] || ""); // Handle missing values
             });
         }
-
-        document.getElementById("output").textContent = JSON.stringify(jsonObject, null, 2);
+        resolve(csvAsJson)
     };
-
-    reader.readAsText(file);
+reader.onerror = (error) => reject(error);
+reader.readAsText(file);
 });
+
+    
+    
+
+}
+
+function displayParameters(csvAsJson) {
+    if (JSON.stringify(csvAsJson) === '{}') {console.log('DisplayParamters returned'); return;} // check if jsonobject is empty. 
+
+    for (const key in csvAsJson) {
+        console.log(key);
+        //for each key(parameter in the json object create a div with parameter class)
+        const new_parameter = document.createElement("div");
+        new_parameter.classList.add('parameter');
+
+
+        //for each div with parameter class create a parameter label with the key as text and parameter_value as class. 
+        const new_parameter_value = document.createElement("p");
+        new_parameter_value.textContent = key;
+        new_parameter_value.classList.add('parameter_value');
+        new_parameter.appendChild(new_parameter_value);
+
+        //for each div with parameter class add a checkbox with class parameter_checkbox.
+        const new_parameter_checkbox = document.createElement("input");
+        new_parameter_checkbox.setAttribute("type", "checkbox")
+        new_parameter_checkbox.classList.add('parameter_check');
+        new_parameter.appendChild(new_parameter_checkbox);
+
+        parameters.appendChild(new_parameter);
+    }
+}
