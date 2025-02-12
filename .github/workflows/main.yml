@@ -1,0 +1,62 @@
+           - name: Cypress.io
+  # You may pin to the exact commit or the version.
+  # uses: cypress-io/github-action@59810ebfa5a5ac6fcfdcfdf036d1cd4d083a88f2
+  uses: cypress-io/github-action@v6.5.0
+  with:
+    # Sends test results to Cypress Cloud
+    record: # optional
+    # Overrides the global Cloud configuration to set the failed test threshold for auto cancellation or to disable auto cancellation when recording to the Cloud (requires Cypress 12.x or later)
+    auto-cancel-after-failures: # optional
+    # Set configuration values. Separate multiple values with a comma. The values set here override any values set in your configuration file.
+    config: # optional
+    # Path to the cypress config file where configuration values are set.
+    config-file: # optional, default is 
+    # Sets Cypress environment variables
+    env: # optional
+    # Name of the browser to use
+    browser: # optional
+    # Command that overrides cypress run
+    command: # optional
+    # Command for starting local server in the background
+    start: # optional
+    # A different start command on Windows
+    start-windows: # optional
+    # Command to run build step before starting tests
+    build: # optional
+    # Whether or not to run install
+    install: # optional
+    # Custom install command to use
+    install-command: # optional
+    # Whether or not to run tests
+    runTests: # optional
+    # Local server URL to wait for
+    wait-on: # optional
+    # Amount of time to wait for wait-on url to be available
+    wait-on-timeout: # optional
+    # Whether or not to load balance tests using multiple containers
+    parallel: # optional
+    # Group setting for tests
+    group: # optional
+    # Tag setting for tests
+    tag: # optional
+    # Working directory containing Cypress folder
+    working-directory: # optional
+    # Whether or not to use headed mode
+    headed: # optional
+    # Whether or not to publish job summary
+    publish-summary: # optional, default is true
+    # Provide a specific specs to run
+    spec: # optional
+    # Path of project to run
+    project: # optional
+    # You can prefix the default test command using the command-prefix option.
+    command-prefix: # optional
+    # ID associates multiple CI machines to one test run
+    ci-build-id: # optional
+    # Custom cache key
+    cache-key: # optional
+    # Whether or not to silence any Cypress specific output from stdout
+    quiet: # optional
+    # Lets the action know that Cypress is running component tests and not e2e tests
+    component: # optional
+          
