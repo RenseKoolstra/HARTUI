@@ -1,10 +1,18 @@
-const jsonObject = {};
-document.getElementById("csvFile").addEventListener("change", function(event) {
+//Global constants
+const csvAsJson = {};
+
+//Read csv
+document.getElementById("csvFile").addEventListener("change", async function(event) {
     const file = event.target.files[0];
+    await readCsv(file);
+    
+});
+
+async function readCsv(file)   {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         const text = e.target.result;
         const lines = text.split("\n").map(line => line.trim()).filter(line => line); // Remove empty lines
         if (lines.length < 2) return; // Ensure we have at least a header + one row
@@ -14,7 +22,7 @@ document.getElementById("csvFile").addEventListener("change", function(event) {
 
         // Initialize keys with empty arrays
         headers.forEach(header => {
-            jsonObject[header] = [];
+            csvAsJson[header] = [];
         });
 
         // Process each row
@@ -23,12 +31,17 @@ document.getElementById("csvFile").addEventListener("change", function(event) {
             
             // Add each value to its corresponding key
             headers.forEach((header, index) => {
-                jsonObject[header].push(values[index] || ""); // Handle missing values
+                csvAsJson[header].push(values[index] || ""); // Handle missing values
             });
         }
-
-        document.getElementById("output").textContent = JSON.stringify(jsonObject, null, 2);
     };
 
     reader.readAsText(file);
-});
+}
+
+function displayParameters() {
+    if (JSON.stringify(csvAsJson) === '{}') return; // check if jsonobject is empty. 
+    for (const key in csvAsJson) {
+        
+    }
+}
