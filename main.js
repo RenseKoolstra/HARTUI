@@ -52,7 +52,6 @@ function displayParameters(csvAsJson) {
     if (JSON.stringify(csvAsJson) === '{}') {console.log('DisplayParamters returned'); return;} // check if jsonobject is empty. 
 
     for (const key in csvAsJson) {
-        console.log(key);
         //for each key(parameter in the json object create a div with parameter class)
         const new_parameter = document.createElement("div");
         new_parameter.classList.add('parameter');
@@ -66,10 +65,10 @@ function displayParameters(csvAsJson) {
 
         //for each div with parameter class add a checkbox with class parameter_checkbox.
         const new_parameter_checkbox = document.createElement("input");
-        new_parameter_checkbox.setAttribute("type", "checkbox")
+        new_parameter_checkbox.setAttribute("type", "radio");
+        new_parameter_checkbox.setAttribute("name", "y-variable");
         new_parameter_checkbox.classList.add('parameter_check');
         new_parameter.appendChild(new_parameter_checkbox);
-
         parameters.appendChild(new_parameter);
     }
 }
