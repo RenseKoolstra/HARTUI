@@ -1,53 +1,66 @@
 //Global constants
 const parameters = document.querySelector("#parameters");
+var csvAsJson = {};
+var t = [];
+var yParameters = {};
 
-//Read csv
+//Eventlistener upload csv
 document.getElementById("csvFile").addEventListener("change", async function(event) {
     const file = event.target.files[0];
     csvAsJson = await readCsv(file);
-    displayParameters(csvAsJson);
-    
+    await getTime(csvAsJson);   
+    displayParameters(yParameters);
 });
 
+//Read csv
 async function readCsv(file)   {
     return new Promise((resolve, reject) => {
-    if (!file) return;
-    
-    const reader = new FileReader();
-    const csvAsJson = {}
-    reader.onload = async function(e) {
-        const text = e.target.result;
-        const lines = text.split("\n").map(line => line.trim()).filter(line => line); // Remove empty lines
-        if (lines.length < 2) return; // Ensure we have at least a header + one row
-
-        const headers = lines[0].split("\t").map(header => header.trim());
+        if (!file) return;
         
+        const reader = new FileReader();
+        const Json = {}
+        reader.onload = async function(e) {
+            const text = e.target.result;
+            const lines = text.split("\n").map(line => line.trim()).filter(line => line); // Remove empty lines
+            if (lines.length < 2) return; // Ensure we have at least a header + one row
 
-        // Initialize keys with empty arrays
-        headers.forEach(header => {
-            csvAsJson[header] = [];
-        });
-
-        // Process each row
-        for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split("\t").map(value => value.trim());
+            const headers = lines[0].split("\t").map(header => header.trim());
             
-            // Add each value to its corresponding key
-            headers.forEach((header, index) => {
-                csvAsJson[header].push(values[index] || ""); // Handle missing values
+
+            // Initialize keys with empty arrays
+            headers.forEach(header => {
+                Json[header] = [];
             });
-        }
-        resolve(csvAsJson)
-    };
-reader.onerror = (error) => reject(error);
-reader.readAsText(file);
-});
 
-    
-    
-
+            // Process each row
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split("\t").map(value => value.trim());
+                
+                // Add each value to its corresponding key
+                headers.forEach((header, index) => {
+                    Json[header].push(Math.round(parseFloat(values[index])*100)/100); 
+                });
+            }
+            resolve(Json)
+        };
+        reader.onerror = (error) => reject(error);
+        reader.readAsText(file);
+    });
 }
 
+//seperatate t from y parameters
+async function getTime(csvAsJson)   {
+    t = {'time [ms]': []};
+    t['time [ms]'].push(csvAsJson['Log Timestamp [498]'][0]);
+    for (let i = 1; i < csvAsJson['Log Timestamp [498]'].length; i++)  {
+        new_t = Math.round((t['time [ms]'][i-1] + csvAsJson['Log Timestamp [498]'][i])*100)/100;
+        t['time [ms]'].push(new_t);
+    } 
+    yParameters = {...csvAsJson};
+    delete yParameters['Log Timestamp [498]'];
+}
+
+//display csv parameters
 function displayParameters(csvAsJson) {
     if (JSON.stringify(csvAsJson) === '{}') {console.log('DisplayParamters returned'); return;} // check if jsonobject is empty. 
 
