@@ -67,11 +67,11 @@ async function readCsv(file)   {
 
 //seperatate t from y parameters
 async function getTime(csvAsJson)   {
-    t = {'time [ms]': []};
-    t['time [ms]'].push(csvAsJson['Log Timestamp [498]'][0]);
+    t = {'time [s]': []};
+    t['time [s]'].push(csvAsJson['Log Timestamp [498]'][0]);
     for (let i = 1; i < csvAsJson['Log Timestamp [498]'].length; i++)  {
-        new_t = Math.round((t['time [ms]'][i-1] + csvAsJson['Log Timestamp [498]'][i])*100)/100;
-        t['time [ms]'].push(new_t);
+        new_t = Math.round((t['time [s]'][i-1] + csvAsJson['Log Timestamp [498]'][i]/1000)*100)/100;
+        t['time [s]'].push(new_t);
     } 
     yParameters = {...csvAsJson};
     delete yParameters['Log Timestamp [498]'];
@@ -108,7 +108,7 @@ function displayParameters(csvAsJson) {
     parameterSelected.addEventListener("change", async function(event) {
         
         //console.log(event.target.value);
-        displaygraph(t['time [ms]'], yParameters[event.target.value], event.target.value);
+        displaygraph(t['time [s]'], yParameters[event.target.value], event.target.value);
     })
 })
 }
@@ -125,7 +125,7 @@ function displaygraph(tValues, yValues, parameter) {
         data: {
             labels: tValues,
             datasets: [{
-                label: 'T-Y Graph',
+                label: parameter,
                 data: yValues,
                 borderColor: 'blue',
                 borderWidth: 2,
@@ -134,11 +134,19 @@ function displaygraph(tValues, yValues, parameter) {
         },
         options: {
             //responsive: true,
+            animation: false,
+            /*
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            },
+            */
             scales: {
                 x: {
                     title: {
                         display: true,
-                        text: 'Time (ms)'
+                        text: 'Time (s)'
                     }
                 },
                 y: {
@@ -149,6 +157,13 @@ function displaygraph(tValues, yValues, parameter) {
                 }
             },
             plugins: {
+                /*
+                decimation: {
+                    enabled: true,
+                    algorithm: 'lttb', // 'lttb' (Largest Triangle Three Buckets) is great for line charts
+                    samples: 100 // Reduces dataset to 100 points when zoomed in
+                },
+                */
                 zoom: {
                     pan: {
                         enabled: true,
@@ -162,12 +177,7 @@ function displaygraph(tValues, yValues, parameter) {
                         pinch: {
                             enabled: true // Enable pinch zooming on touch devices
                         },
-                        mode: 'x', // Zoom in/out on the x-axis
-                        /*
-                        animation: {
-                            duration: 50
-                        }
-                        */
+                        mode: 'x', // Zoom in/out on the x-axis                        
                     }
                 }
             }       
