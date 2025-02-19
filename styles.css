@@ -24,28 +24,32 @@ main {
 
 #leftbox {
     display: flex;
-    color: hsl(119, 71%, 81%);
     flex-direction: column;
     align-items: left;
 }
 #rightbox {
     display: flex;
-    background-color: hsl(241, 71%, 81%);
     flex-direction: column;
     align-items: center;
+    margin: 0;
+    padding: 20;
 }
 #choosecsv {
-    background-color: hsl(73, 45%, 48%);
+    margin: 0;
+    padding: 20;
 }
 
 #chooseYvariable {
-    color: hsl(27, 35%, 50%);
+    margin: 0;
+    padding: 20;
 }
 
 .parameter{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin: 0;
+    padding: 0;
 }
 .parameter_value {
     color: black;
