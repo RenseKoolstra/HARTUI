@@ -1,8 +1,18 @@
+//packages
+//import Chart from 'chart.js'
+
+
+
 //Global constants
 const parameters = document.querySelector("#parameters");
+const simpleChart = document.querySelector("#simpleChart");
+var parameterCheck = document.querySelectorAll(".parameter_check");
 var csvAsJson = {};
-var t = [];
+var t = {};
 var yParameters = {};
+let myChart;
+
+
 
 //Eventlistener upload csv
 document.getElementById("csvFile").addEventListener("change", async function(event) {
@@ -10,7 +20,14 @@ document.getElementById("csvFile").addEventListener("change", async function(eve
     csvAsJson = await readCsv(file);
     await getTime(csvAsJson);   
     displayParameters(yParameters);
+    
 });
+
+
+
+
+  
+
 
 //Read csv
 async function readCsv(file)   {
@@ -79,9 +96,82 @@ function displayParameters(csvAsJson) {
         //for each div with parameter class add a checkbox with class parameter_checkbox.
         const new_parameter_checkbox = document.createElement("input");
         new_parameter_checkbox.setAttribute("type", "radio");
+        new_parameter_checkbox.setAttribute("value", key);
         new_parameter_checkbox.setAttribute("name", "y-variable");
         new_parameter_checkbox.classList.add('parameter_check');
         new_parameter.appendChild(new_parameter_checkbox);
         parameters.appendChild(new_parameter);
     }
+    parameterCheck = document.querySelectorAll(".parameter_check");
+    //Eventlister for buttons
+    parameterCheck.forEach((parameterSelected) => {
+    parameterSelected.addEventListener("change", async function(event) {
+        
+        //console.log(event.target.value);
+        displaygraph(t['time [ms]'], yParameters[event.target.value], event.target.value);
+    })
+})
 }
+
+function displaygraph(tValues, yValues, parameter) {
+   
+    if (myChart) {
+        myChart.destroy();
+        myChart = null; // Clear reference
+    }
+
+    myChart = new Chart(simpleChart, {
+        type: 'line',
+        data: {
+            labels: tValues,
+            datasets: [{
+                label: 'T-Y Graph',
+                data: yValues,
+                borderColor: 'blue',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            //responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Time (ms)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: parameter
+                    }
+                }
+            },
+            plugins: {
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'xy' // Enable panning on the x-axis
+                    },
+                    zoom: {
+                        wheel: {
+                            enabled: true,
+                            speed: 0.4
+                        },
+                        pinch: {
+                            enabled: true // Enable pinch zooming on touch devices
+                        },
+                        mode: 'x', // Zoom in/out on the x-axis
+                        /*
+                        animation: {
+                            duration: 50
+                        }
+                        */
+                    }
+                }
+            }       
+        },        
+    });
+}
+
