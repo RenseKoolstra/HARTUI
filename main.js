@@ -78,10 +78,15 @@ async function getTime(csvAsJson)   {
 }
 
 //display csv parameters
-function displayParameters(csvAsJson) {
-    if (JSON.stringify(csvAsJson) === '{}') {console.log('DisplayParamters returned'); return;} // check if jsonobject is empty. 
+function displayParameters(yParameters) {
+    //delete all old parameters
+    const oldParameters = document.querySelectorAll(".parameter");
+    oldParameters.forEach((oldParamter) => {
+        oldParamter.remove();
+    });
+    if (JSON.stringify(yParameters) === '{}') {console.log('DisplayParamters returned'); return;} // check if jsonobject is empty. 
 
-    for (const key in csvAsJson) {
+    for (const key in yParameters) {
         //for each key(parameter in the json object create a div with parameter class)
         const new_parameter = document.createElement("div");
         new_parameter.classList.add('parameter');
@@ -177,7 +182,7 @@ function displaygraph(tValues, yValues, parameter) {
                         pinch: {
                             enabled: true // Enable pinch zooming on touch devices
                         },
-                        mode: 'x', // Zoom in/out on the x-axis                        
+                        mode: 'xy', // Zoom in/out on the x-axis                        
                     }
                 }
             }       
