@@ -26,7 +26,7 @@ jobs:
           # Checkout master and merge the branch
           git fetch origin master
           git checkout master
-          git merge --no-ff --allow-unrelated-histories "${{ github.ref_name }}" -m "Auto-merging ${{ github.ref_name }} into master"
+          git merge --no-ff --allow-unrelated-histories "${{ github.ref_name }}" -m "Auto-merging ${{ github.ref_name }} into master" || git merge --strategy=recursive -X theirs
 
           # Push the changes
           git push origin master
