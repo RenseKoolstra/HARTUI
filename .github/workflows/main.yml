@@ -1,5 +1,8 @@
 name: End-to-end tests
 on: push
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   cypress-run:
     runs-on: ubuntu-24.04
@@ -10,3 +13,17 @@ jobs:
       # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v6
+      - name: Merge Branch into Master
+        if: success()
+        run: |
+          # Set up Git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Checkout master and merge the branch
+          git fetch origin master
+          git checkout master
+          git merge --no-ff "${{ github.ref_name }}" -m "Auto-merging ${{ github.ref_name }} into master"
+
+          # Push the changes
+          git push origin master
