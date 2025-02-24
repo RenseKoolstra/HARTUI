@@ -1,5 +1,8 @@
 name: End-to-end tests
-on: push
+on: 
+  push:
+    branches-ignore:
+      - master  # Ignore pushes to master, only trigger on feature branches
 permissions:
   contents: write
   pull-requests: write
