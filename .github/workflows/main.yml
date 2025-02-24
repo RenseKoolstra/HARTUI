@@ -27,3 +27,10 @@ jobs:
 
           # Push the changes
           git push origin master
+      - name: Delete Branch After Merge
+        if: success()
+        run: |
+          echo "Deleting branch ${{ github.ref_name }}..."
+          git push origin --delete "${{ github.ref_name }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
