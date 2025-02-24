@@ -113,6 +113,7 @@ function displayParameters(yParameters) {
     parameterSelected.addEventListener("change", async function(event) {
         
         //console.log(event.target.value);
+        console.log(Math.max(...yParameters[event.target.value]));
         displaygraph(t['time [s]'], yParameters[event.target.value], event.target.value);
     })
 })
@@ -138,15 +139,9 @@ function displaygraph(tValues, yValues, parameter) {
             }]
         },
         options: {
-            //responsive: true,
+           
             animation: false,
-            /*
-            interaction: {
-                mode: 'nearest',
-                axis: 'x',
-                intersect: false
-            },
-            */
+            
             scales: {
                 x: {
                     title: {
@@ -162,25 +157,34 @@ function displaygraph(tValues, yValues, parameter) {
                 }
             },
             plugins: {
-                /*
-                decimation: {
-                    enabled: true,
-                    algorithm: 'lttb', // 'lttb' (Largest Triangle Three Buckets) is great for line charts
-                    samples: 100 // Reduces dataset to 100 points when zoomed in
-                },
-                */
+               
                 zoom: {
+                    limits: {
+                        y: {min: Math.min(...yValues) - (Math.max(...yValues) - Math.min(...yValues))*0.1, max: Math.max(...yValues) + (Math.max(...yValues) - Math.min(...yValues))*0.1}
+                    },
                     pan: {
                         enabled: true,
-                        mode: 'xy' // Enable panning on the x-axis
+                        onPanStart({chart, point}) {
+                            const area = chart.chartArea;
+                            const w25 = area.width * 0.25;
+                            const h25 = area.height * 0.25;
+                            if (point.x < area.left + w25 || point.x > area.right - w25
+                              || point.y < area.top + h25 || point.y > area.bottom - h25) {
+                              return false; // abort
+                            }
+                        },
+                        mode: 'xy', // Enable panning on the x-axis
+                        threshold: 100, // Minimum distance to start panning (useful for touch devices)
+                        speed: 0.3, // Adjust pan speed (lower = slower)
                     },
                     zoom: {
                         wheel: {
                             enabled: true,
-                            speed: 0.4
+                            speed: 0.1
                         },
                         pinch: {
-                            enabled: true // Enable pinch zooming on touch devices
+                            enabled: true, // Enable pinch zooming on touch devices
+                            speed: 0.2
                         },
                         mode: 'xy', // Zoom in/out on the x-axis                        
                     }
