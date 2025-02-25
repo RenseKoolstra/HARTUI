@@ -28,11 +28,9 @@ main {
     align-items: left;
 }
 #rightbox {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0;
-    padding: 20;
+    margin: 30;
+    padding: 30;
+    flex-grow: 1;
 }
 #choosecsv {
     margin: 0;
@@ -62,4 +60,14 @@ main {
 .parameter_check{
     margin: 0;
     padding: 0;
+}
+
+#timeGraph{
+    background-color: aquamarine;
+    width: 80%;
+    height: 100%;
+}
+
+#simpleChart{
+    width: 100%;
 }
