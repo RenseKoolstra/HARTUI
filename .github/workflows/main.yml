@@ -16,15 +16,18 @@ jobs:
       # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v6
+  merge-branch:
+    runs-on: ubuntu-24.04
+    needs: cypress-run
+    steps:
       - name: Merge Branch into Master
-        if: success()
         run: |
           # Set up Git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           # Checkout master and merge the branch
-          git fetch origin master
+          git pull
           git checkout master
           git merge --no-ff --allow-unrelated-histories "${{ github.ref_name }}" -m "Auto-merging ${{ github.ref_name }} into master" 
           # Push the changes
