@@ -20,14 +20,20 @@ jobs:
     runs-on: ubuntu-24.04
     needs: cypress-run
     steps:
-      - name: Merge Branch into Master
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches
+      - name: Configure git
+        # Set up Git
         run: |
-          # Set up Git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
+      - name: Pull latest changes
+        run: git pull origin master
+      - name: Merge Branch into Master
+        run: |         
           # Checkout master and merge the branch
-          git pull
           git checkout master
           git merge --no-ff --allow-unrelated-histories "${{ github.ref_name }}" -m "Auto-merging ${{ github.ref_name }} into master" 
           # Push the changes
