@@ -166,6 +166,7 @@ function displaygraph(tValues, yValues, parameter) {
                 console.log('Fully stacked activated')
                 multiplescales[`y${i}`] = 
                     {
+                        
                         title: {
                             display: true,
                             text: parameter[i]    
@@ -189,6 +190,7 @@ function displaygraph(tValues, yValues, parameter) {
                 console.log('Semi stacked activated')
                 multiplescales[`y${i}`] = 
                     {
+                        display: false,
                         title: {
                             display: true,
                             text: parameter[i]    
@@ -213,6 +215,7 @@ function displaygraph(tValues, yValues, parameter) {
             console.log('not stacked activated')
                 multiplescales[`y${i}`] = 
                     {
+                        display: false,
                         title: {
                             display: true,
                             text: parameter[i]    
