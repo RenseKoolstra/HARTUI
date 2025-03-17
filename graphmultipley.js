@@ -42,7 +42,6 @@ function displaygraph(tValues, yValues, parameter) {
                     display: true,
                     text: parameter[i]    
                 },
-                
                 type: 'linear',
                 offset: true,
                 position: 'left',

@@ -3,6 +3,8 @@
 
 
 
+
+
 //Global constants
 const parameters = document.querySelector("#parameters");
 const simpleChart = document.querySelector("#simpleChart");
@@ -14,11 +16,30 @@ var yParameters = {}
 var datalist = [];
 var parameterlist = [];
 let myChart;
+var prefersDarkScheme = false;
 
-display.addEventListener("change", async function(event) {
+const updateTheme = () => {
+    prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    console.log(prefersDarkScheme ? "Dark Mode" : "Light Mode");
+    displaygraph(t['time [s]'], datalist, parameterlist);
+};
+
+// Initial check
+updateTheme();
+
+// Listen for changes
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", updateTheme);
+
+
+display.addEventListener("change", async function() {
     displaymode = display.value;
     displaygraph(t['time [s]'], datalist, parameterlist);
 })
+
+//prefersDarkScheme.addEventListener("change", async function() {
+  //  displaygraph(t['time [s]'], datalist, parameterlist);
+//})
+
 
 
 
@@ -137,7 +158,15 @@ function displayParameters(yParameters) {
 
 function displaygraph(tValues, yValues, parameter) {
     let dsets = [];
-    let ylimits = {}
+    let ylimits = {};
+    if (!prefersDarkScheme) {
+        var gridColor = 'rgb(180, 180, 180)';
+        var textcolor = 'rgb(0, 0, 0)';
+    } else {
+        var gridColor = 'rgb(70, 70, 70)';
+        var textcolor = 'rgb(250, 250, 250)';
+    }
+    
      if (myChart) {
          myChart.destroy();
          myChart = null; // Clear reference
@@ -146,8 +175,18 @@ function displaygraph(tValues, yValues, parameter) {
          'x': {
              title: {
                  display: true,
-                 text: 'Time (s)'
+                 text: 'Time (s)',
+                 color: textcolor
+             },
+
+             grid: {
+                color: gridColor,
+             },
+             ticks: {
+                color: textcolor
              }
+
+           
          }
      }
  
@@ -160,7 +199,6 @@ function displaygraph(tValues, yValues, parameter) {
              fill: false,
              yAxisID: `y${i}`
          };
-        console.log(displaymode);
         switch(displaymode)    {
             case "Fully stacked":
                 console.log('Fully stacked activated')
@@ -169,22 +207,29 @@ function displaygraph(tValues, yValues, parameter) {
                         
                         title: {
                             display: true,
-                            text: parameter[i]    
+                            text: parameter[i],   
+                            color: textcolor 
                         },
-                        
+                       
                         type: 'linear',
                         offset: true,
-                        position: 'left',
-
-                        
+                        position: 'left',                        
                         stack: 'demo',
-                        //min: Math.min(...yValues[i]) - (Math.max(...yValues[i]) - Math.min(...yValues[i]))*0.1,
-                        //max: Math.max(...yValues[i]) + (Math.max(...yValues[i]) - Math.min(...yValues[i]))*0.1           
+                        grid: {
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textcolor
+                         }
+            
+            
                     }
                     ylimits[`y${i}`] = {
                         min: Math.min(...yValues[i]) - (Math.max(...yValues[i]) - Math.min(...yValues[i]))*0.1,
                         max: Math.max(...yValues[i]) + (Math.max(...yValues[i]) + Math.min(...yValues[i]))*0.1  
                     }
+                    
+
                     break;
             case "Semi stacked":
                 console.log('Semi stacked activated')
@@ -193,9 +238,16 @@ function displaygraph(tValues, yValues, parameter) {
                         display: false,
                         title: {
                             display: true,
-                            text: parameter[i]    
+                            text: parameter[i],
+                            color: textcolor 
                         },
-                        
+                        grid: {
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textcolor
+                         },
+            
                         type: 'linear',
                         offset: true,
                         position: 'left',
@@ -218,9 +270,16 @@ function displaygraph(tValues, yValues, parameter) {
                         display: false,
                         title: {
                             display: true,
-                            text: parameter[i]    
+                            text: parameter[i],  
+                            color: textcolor
                         },
-                        
+                        grid: {
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textcolor
+                         },
+            
                         type: 'linear',
                         offset: true,
                         position: 'left',
@@ -235,58 +294,57 @@ function displaygraph(tValues, yValues, parameter) {
                         max: Math.max(...yValues[i]) + (Math.max(...yValues[i]) - Math.min(...yValues[i]))*0.1 
                 }
         }
-
-
-
-
-         
-     }
-     console.log(multiplescales)
-     myChart = new Chart(simpleChart, {
-         type: 'line',
-         data: {
-             labels: tValues,
-             datasets: dsets,
-             
-         },
-         options: {
-             responsive: true,
-             animation: false,
-             
-             scales : multiplescales,
-             
-             plugins: {
-                
-                 zoom: {
-                     limits: ylimits,
-                     pan: {
-                         enabled: true,
-                         onPanStart({chart, point}) {
-                             const area = chart.chartArea;
-                             const w10 = area.width * 0.1;
-                             const h10 = area.height * 0.1;
-                             if (point.x < area.left + w10 || point.x > area.right - w10
+    }
+    
+    myChart = new Chart(simpleChart, {
+        type: 'line',
+        data: {
+            labels: tValues,
+            datasets: dsets,
+            
+        },
+        options: {
+            
+            responsive: true,
+            animation: false,
+            
+            scales : multiplescales,
+            
+            plugins: {
+                legend: {
+                    labels: {color: textcolor}
+                },
+               
+                zoom: {
+                    limits: ylimits,
+                    pan: {
+                        enabled: true,
+                        onPanStart({chart, point}) {
+                            const area = chart.chartArea;
+                            const w10 = area.width * 0.1;
+                            const h10 = area.height * 0.1;
+                            if (point.x < area.left + w10 || point.x > area.right - w10
                                || point.y < area.top + h10 || point.y > area.bottom - h10) {
                                return false; // abort
-                             }
-                         },
-                         mode: 'xy', // Enable panning on the x-axis
-                         threshold: 100, // Minimum distance to start panning (useful for touch devices)
-                         speed: 0.3, // Adjust pan speed (lower = slower)
-                     },
-                     zoom: {
-                         wheel: {
-                             enabled: true,
-                             speed: 0.1
-                         },
-                         pinch: {
-                             enabled: true, // Enable pinch zooming on touch devices
-                             speed: 0.2
-                         },
-                         mode: 'xy', // Zoom in/out on the x-axis                        
-                     }
-                 }
-             }       
-         },        
-     });
- }
+                            }
+                        },
+                        mode: 'xy', // Enable panning on the x-axis
+                        threshold: 100, // Minimum distance to start panning (useful for touch devices)
+                        speed: 0.3, // Adjust pan speed (lower = slower)
+                    },
+                    zoom: {
+                        wheel: {
+                            enabled: true,
+                            speed: 0.1
+                        },
+                        pinch: {
+                            enabled: true, // Enable pinch zooming on touch devices
+                            speed: 0.2
+                        },
+                        mode: 'xy', // Zoom in/out on the x-axis                        
+                    }
+                }
+            }       
+        },        
+    });
+}
