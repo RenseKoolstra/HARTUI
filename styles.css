@@ -67,6 +67,13 @@ main {
 
 #display_options {
     padding: 0px 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+#lightdarkemoji {
+    padding: 0px 0px;
+    margin: 0px 0px;
 }
 
 #parameters {
