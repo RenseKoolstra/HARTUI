@@ -1,14 +1,8 @@
-//packages
-//import Chart from 'chart.js'
-
-
-
-
-
 //Global constants
 const parameters = document.querySelector("#parameters");
 const simpleChart = document.querySelector("#simpleChart");
 const display = document.querySelector('#DisplayOptions');
+const lightdarkemoji = document.querySelector('#lightdarkemoji')
 var displaymode = display.value;
 var csvAsJson = {};
 var t = {};
@@ -16,32 +10,30 @@ var yParameters = {}
 var datalist = [];
 var parameterlist = [];
 let myChart;
-var prefersDarkScheme = false;
+var prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-const updateTheme = () => {
-    prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    console.log(prefersDarkScheme ? "Dark Mode" : "Light Mode");
+lightdarkemoji.textContent = prefersDarkScheme ? '🌙': '☀️';
+
+
+function changelightdark() {
+    prefersDarkScheme = prefersDarkScheme ? 0:1;
+    document.documentElement.style.setProperty('color-scheme', prefersDarkScheme ? "dark":"light");
+    lightdarkemoji.textContent = prefersDarkScheme ? "🌙":"☀️";
     displaygraph(t['time [s]'], datalist, parameterlist);
-};
+}
 
-// Initial check
-updateTheme();
-
-// Listen for changes
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", updateTheme);
+lightdarkemoji.addEventListener("click", changelightdark);
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches != prefersDarkScheme) {
+        changelightdark();
+    }
+});
 
 
 display.addEventListener("change", async function() {
     displaymode = display.value;
     displaygraph(t['time [s]'], datalist, parameterlist);
 })
-
-//prefersDarkScheme.addEventListener("change", async function() {
-  //  displaygraph(t['time [s]'], datalist, parameterlist);
-//})
-
-
-
 
 //Eventlistener upload csv
 document.getElementById("csvFile").addEventListener("change", async function(event) {
@@ -51,12 +43,6 @@ document.getElementById("csvFile").addEventListener("change", async function(eve
     displayParameters(yParameters);
     
 });
-
-
-
-
-  
-
 
 //Read csv
 async function readCsv(file)   {
