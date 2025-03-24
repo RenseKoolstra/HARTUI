@@ -1,4 +1,4 @@
-const chosenY = ['Intake air temp [17]', 'MAP [20]', 'Oil Pressure [804]'] 
+const chosenY = ['Intake air temp [17]', 'MAP [20]', 'Ignition angle [60]'] 
 //let SSfullysctacked;
 describe('testsuite4', () => {
     /*before(() => {
