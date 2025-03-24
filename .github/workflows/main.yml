@@ -21,7 +21,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add *
+          git add -f cypress/screenshots/*
           git commit -m 'added screenshots'
           git push origin -u HEAD
     env:
