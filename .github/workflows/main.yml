@@ -23,13 +23,25 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add -f cypress/screenshots/*
-          git add -f cypress/snapshots/*/_diff_output_/*
-          if git diff --cached --exit-code; then
-            echo "No changes to commit."
-          else
-            git commit -m 'added screenshots'
-            git push origin -u HEAD
+
+          if [ -d "cypress/snapshots" ] && find cypress/snapshots -type d -name "_diff_output" | grep .; then
+            # Check if there are new or modified files in _diff_output
+            if git ls-files --others --modified --exclude-standard cypress/snapshots/*/_diff_output/* | grep .; then
+              git add -f cypress/snapshots/*/_diff_output/*
+                # Check if there are staged changes before committing
+                if git diff --cached --exit-code; then
+                  echo "No changes to commit."
+                else
+                  git commit -m "Add updated Cypress diff screenshots"
+                  git push origin -u HEAD
+                fi
+              else
+                echo "No new files to add."
+              fi
+            else
+              echo "No _diff_output directories found. Skipping commit step."
           fi
+          
         
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
