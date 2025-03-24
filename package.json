@@ -9,6 +9,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@simonsmith/cypress-image-snapshot": "^9.1.0",
     "cypress": "^14.0.3"
   },
   "dependencies": {

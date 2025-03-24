@@ -9,7 +9,7 @@ var t = {};
 var yParameters = {}
 var datalist = [];
 var parameterlist = [];
-let myChart;
+var myChart;
 var prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
 lightdarkemoji.textContent = prefersDarkScheme ? '🌙': '☀️';
@@ -186,8 +186,7 @@ function displaygraph(tValues, yValues, parameter) {
              yAxisID: `y${i}`
          };
         switch(displaymode)    {
-            case "Fully stacked":
-                console.log('Fully stacked activated')
+            case "fully stacked":
                 multiplescales[`y${i}`] = 
                     {
                         
@@ -217,8 +216,7 @@ function displaygraph(tValues, yValues, parameter) {
                     
 
                     break;
-            case "Semi stacked":
-                console.log('Semi stacked activated')
+            case "semi stacked":
                 multiplescales[`y${i}`] = 
                     {
                         display: false,
@@ -250,7 +248,6 @@ function displaygraph(tValues, yValues, parameter) {
                     }
                     break;
             case "not stacked": 
-            console.log('not stacked activated')
                 multiplescales[`y${i}`] = 
                     {
                         display: false,

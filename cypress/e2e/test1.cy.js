@@ -44,7 +44,7 @@ describe('testsuite 1', () =>{
                     expect(text).to.equal(keys[index]);
                 });
                 cy.wrap($el)
-                .find('input[type="radio"]')
+                .find('input[type="checkbox"]')
                 .should('exist');
             })             
         })              

@@ -1,5 +1,61 @@
-1. site exist
-2. csv turned into json
-3. dt turned into t array
-4. object of y-variables
-5. label created for all y-variables
+TestSuite 1: Website exist with all it's initial features.
+    init: visit website                                                         
+    1a: site exist.                                                                     X
+    1b: title exist.                                                                    X
+    1c: Header exist with correct label.                                                X
+    1d: Left and right <div> exist.                                                     X
+    1e: upload csv textbox exist.                                                       X
+    1f: change display dropdownbox exist with options:                                  X
+        - fully stacked
+        - semi stacked
+        - not stacked
+    1g: light dark emoji exist with sun for light and moon for dark.                    X
+    1h: light dark mode switches when clicked on emoji.                                 X
+
+TestSuite 2: Evertyhing shows up correctly when uploading csv.
+    init1: upload jsonobject with data.
+    init2: upload jsonobject with tdata
+    init3: upload jsonobject with y-variables.
+    init4: before each test visit the site. 
+    init5: before each test upload csv file. 
+
+    2a: csv is turned into json.
+    2b: t array exist equal to dt from testdata.
+    2c: object with y-variables exist equal to data from testdata.
+    2d: label created for all y-variables.
+    2e: checkbox created for all y-variables.
+
+
+TestSuite 3a: Graph(s) are shown correctly when y-variables are selected. Random variables selected
+    init1: visit website.
+    init2: upload csv with test data.
+    init3: select fully stacked visual.
+    init4: check 3 random y-variables with checkbox.
+    3a: myChart exist
+    3b: x axis is same as t array
+    3c: y axis is same as y-variables
+
+TestSuite 3b: Graph is shown correctly when y-variables are selected. Specific variables are chosen and graph compaired with screenshot.
+    init1: visit website.
+    init2: upload csv with test data.
+    init3: select fully stacked visual.
+    init4: select 1 pre-determined y-variables with checkbox.
+    init5: upload testscreenshot with 1 y-variable.
+    init6: upload testscreenshot with 2 y-variable.
+    init7: upload testscreenshot with 3 y-variable.
+    3a: schreenshot is equal to testscreenshot 1 y-variable.
+    init8: add 1 pre-determined y-variables with checkbox.
+    3b: schreenshot is equal to testscreenshot 2 y-variable.
+    init9: add 1 pre-determined y-variables with checkbox.
+    3c: schreenshot is equal to testscreenshot 3 y-variable.
+
+TestSuite 4: Graph(s) are shown correctly when display options are selected. (screenshots)
+    init1: visit website.
+    init2: upload csv with test data.
+    init3: select semi stacked visual.
+    init4: select 3 pre-determined y-variables with checkbox.
+    init5: upload semi stacked testscreenshot.
+    init6: upload not stacked testscreenshot.
+    4a: schreenshot is equal to semi stacked testscreenshot.
+    init7: select not stacked visual.
+    4b: schreenshot is equal to not stacked testscreenshot.
