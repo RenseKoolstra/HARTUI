@@ -183,7 +183,10 @@ function displaygraph(tValues, yValues, parameter) {
              data: yValues[i],
              borderWidth: 2,
              fill: false,
-             yAxisID: `y${i}`
+             yAxisID: `y${i}`,
+             pointStyle: 'circle',
+             pointRadius: 1,
+             pointHoverRadius: 6, 
          };
         switch(displaymode)    {
             case "fully stacked":
@@ -296,6 +299,9 @@ function displaygraph(tValues, yValues, parameter) {
             plugins: {
                 legend: {
                     labels: {color: textcolor}
+                },
+                tooltip: {
+                    enabled: true
                 },
                
                 zoom: {

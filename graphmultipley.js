@@ -34,7 +34,8 @@ function displaygraph(tValues, yValues, parameter) {
             //borderColor: 'blue',
             borderWidth: 2,
             fill: false,
-            yAxisID: `y${i}`
+            yAxisID: `y${i}`,
+            pointStyle: false
         };
         multiplescales[`y${i}`] = 
             {

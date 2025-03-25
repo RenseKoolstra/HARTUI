@@ -1,12 +1,6 @@
 const chosenY = ['Intake air temp [17]', 'MAP [20]', 'Oil Pressure [804]'] 
 //let SSfullysctacked;
 describe('testsuite4', () => {
-    /*before(() => {
-        cy.fixture('screenshot/fullysctacked.png').then((fullysctacked) => {
-            SSfullysctacked = fullysctacked;
-        });
-    });
-    */
     beforeEach(() => {
         //init1 visit website.
         cy.visit('index.html');
@@ -37,19 +31,14 @@ describe('testsuite4', () => {
         cy.get('#simpleChart').screenshot('fully stacked')
         cy.matchImageSnapshot('fully stacked');
     })
-    
     it('sreenshot semi stacked', () => {
         cy.get('#DisplayOptions').select('semi stacked')
         cy.get('#simpleChart').screenshot('semi stacked')
         cy.matchImageSnapshot('semi stacked');
     }) 
-    
     it('sreenshot not stacked', () => {
         cy.get('#DisplayOptions').select('not stacked')
         cy.get('#simpleChart').screenshot('not stacked')
         cy.matchImageSnapshot('not stacked');
-    })  
-    
-
-  
+    })    
 })
