@@ -41,7 +41,7 @@ document.getElementById("csvFile").addEventListener("change", async function(eve
     csvAsJson = await readCsv(file);
     await getTime(csvAsJson);   
     displayParameters(yParameters);
-    
+    displayCreateParameter();
 });
 
 //Read csv
@@ -142,6 +142,16 @@ function displayParameters(yParameters) {
     })
 }
 
+//display createParameterButton
+function displayCreateParameter()   {
+    const createParameterButtonBox = document.querySelector("#createParameterButtonBox")
+    const createParameterButton = document.createElement("button");
+    createParameterButton.textContent = 'new parameter';
+    createParameterButton.setAttribute('id', "createParameterButton");
+    createParameterButtonBox.appendChild(createParameterButton);
+}
+
+//create myChart object
 function displaygraph(tValues, yValues, parameter) {
     let dsets = [];
     let ylimits = {};
