@@ -154,23 +154,28 @@ function displayCreateParameterButton()   {
 
 function createCreateParameterEventListener()    {
     document.getElementById('createParameterButton').addEventListener("click", () => {
-        const new_parameter = prompt("name of the new parameter")
-        var equation = prompt("equation of the new parameter.");
+        const new_parameter = prompt("name of the new parameter");
+        const equation = prompt("equation of the new parameter.");
         if (equation === null) {
             console.log("No input given");
         } else {
-            const scope = {};
-            let i = 0;
-            for (let key in yParameters) {
-                if (equation.includes(key)) {
-                    i++
-                    equation = equation.replace(key, `var${i}`)
-                    Object.assign(scope, {[`var${i}`]: yParameters[key]});
-                }                
-            }
+            
             try {
-                const result = math.evaluate(equation, scope);
-                console.log("Result:", result);
+                const result = [];
+                for (var i = 0; i < t['time [s]'].length; i++) {
+                    const scope = {};
+                    let equation_t = equation
+                    let j = 0;
+                    for (let key in yParameters) {
+                        if (equation.includes(key.toString())) {
+                            j++
+                            equation_t = equation_t.replace(new RegExp(escapeRegex(key), 'g'), `var${j}_${i}`)
+                            console.log(equation_t)
+                            Object.assign(scope, {[`var${j}_${i}`]: yParameters[key][i]});
+                        }                
+                    }
+                    result.push(math.evaluate(equation_t, scope));
+                }                
                 Object.assign(yParameters, {[new_parameter]: result})
                 displayParameters()
             } catch (error) {
@@ -376,4 +381,10 @@ function displaygraph(tValues, yValues, parameter) {
             }       
         },        
     });
+}
+
+//used to get rid of special characters in string so that they can be used in methods. 
+
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape regex special characters
 }
