@@ -35,13 +35,14 @@ display.addEventListener("change", async function() {
     displaygraph(t['time [s]'], datalist, parameterlist);
 })
 
-//Eventlistener upload csv
+//main program
 document.getElementById("csvFile").addEventListener("change", async function(event) {
     const file = event.target.files[0];
     csvAsJson = await readCsv(file);
-    await getTime(csvAsJson);   
-    displayParameters(yParameters);
-    displayCreateParameter();
+    await getTime();   
+    displayParameters();
+    displayCreateParameterButton();
+    createCreateParameterEventListener();
 });
 
 //Read csv
@@ -81,7 +82,7 @@ async function readCsv(file)   {
 }
 
 //seperatate t from y parameters
-async function getTime(csvAsJson)   {
+async function getTime()   {
     t = {'time [s]': []};
     t['time [s]'].push(csvAsJson['Log Timestamp [498]'][0]);
     for (let i = 1; i < csvAsJson['Log Timestamp [498]'].length; i++)  {
@@ -93,7 +94,7 @@ async function getTime(csvAsJson)   {
 }
 
 //display csv parameters
-function displayParameters(yParameters) {
+function displayParameters() {
     //delete all old parameters
     const oldParameters = document.querySelectorAll(".parameter");
     oldParameters.forEach((oldParamter) => {
@@ -143,7 +144,7 @@ function displayParameters(yParameters) {
 }
 
 //display createParameterButton
-function displayCreateParameter()   {
+function displayCreateParameterButton()   {
     const createParameterButtonBox = document.querySelector("#createParameterButtonBox")
     const createParameterButton = document.createElement("button");
     createParameterButton.textContent = 'new parameter';
@@ -151,6 +152,35 @@ function displayCreateParameter()   {
     createParameterButtonBox.appendChild(createParameterButton);
 }
 
+function createCreateParameterEventListener()    {
+    document.getElementById('createParameterButton').addEventListener("click", () => {
+        const new_parameter = prompt("name of the new parameter")
+        var equation = prompt("equation of the new parameter.");
+        if (equation === null) {
+            console.log("No input given");
+        } else {
+            const scope = {};
+            let i = 0;
+            for (let key in yParameters) {
+                if (equation.includes(key)) {
+                    i++
+                    equation = equation.replace(key, `var${i}`)
+                    Object.assign(scope, {[`var${i}`]: yParameters[key]});
+                }                
+            }
+            try {
+                const result = math.evaluate(equation, scope);
+                console.log("Result:", result);
+                Object.assign(yParameters, {[new_parameter]: result})
+                displayParameters()
+            } catch (error) {
+                console.error("Invalid input:", error.message);
+                alert("Error: Invalid mathematical expression! Please try again.");
+            }
+            
+        }
+    })
+}
 //create myChart object
 function displaygraph(tValues, yValues, parameter) {
     let dsets = [];
@@ -347,6 +377,3 @@ function displaygraph(tValues, yValues, parameter) {
         },        
     });
 }
-
-
-//change!!
