@@ -384,7 +384,6 @@ function displaygraph(tValues, yValues, parameter) {
 }
 
 //used to get rid of special characters in string so that they can be used in methods. 
-
 function escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape regex special characters
 }
