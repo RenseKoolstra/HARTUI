@@ -106,3 +106,7 @@ main {
     height: 99%;
 }
 
+#createParameterButtonBox{
+    align-self: center;
+    margin: 20px;
+}

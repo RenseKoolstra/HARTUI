@@ -35,13 +35,14 @@ display.addEventListener("change", async function() {
     displaygraph(t['time [s]'], datalist, parameterlist);
 })
 
-//Eventlistener upload csv
+//main program
 document.getElementById("csvFile").addEventListener("change", async function(event) {
     const file = event.target.files[0];
     csvAsJson = await readCsv(file);
-    await getTime(csvAsJson);   
-    displayParameters(yParameters);
-    
+    await getTime();   
+    displayParameters();
+    displayCreateParameterButton();
+    createCreateParameterEventListener();
 });
 
 //Read csv
@@ -81,7 +82,7 @@ async function readCsv(file)   {
 }
 
 //seperatate t from y parameters
-async function getTime(csvAsJson)   {
+async function getTime()   {
     t = {'time [s]': []};
     t['time [s]'].push(csvAsJson['Log Timestamp [498]'][0]);
     for (let i = 1; i < csvAsJson['Log Timestamp [498]'].length; i++)  {
@@ -93,7 +94,7 @@ async function getTime(csvAsJson)   {
 }
 
 //display csv parameters
-function displayParameters(yParameters) {
+function displayParameters() {
     //delete all old parameters
     const oldParameters = document.querySelectorAll(".parameter");
     oldParameters.forEach((oldParamter) => {
@@ -142,6 +143,50 @@ function displayParameters(yParameters) {
     })
 }
 
+//display createParameterButton
+function displayCreateParameterButton()   {
+    const createParameterButtonBox = document.querySelector("#createParameterButtonBox")
+    const createParameterButton = document.createElement("button");
+    createParameterButton.textContent = 'new parameter';
+    createParameterButton.setAttribute('id', "createParameterButton");
+    createParameterButtonBox.appendChild(createParameterButton);
+}
+
+function createCreateParameterEventListener()    {
+    document.getElementById('createParameterButton').addEventListener("click", () => {
+        const new_parameter = prompt("name of the new parameter");
+        const equation = prompt("equation of the new parameter.");
+        if (equation === null) {
+            console.log("No input given");
+        } else {
+            
+            try {
+                const result = [];
+                for (var i = 0; i < t['time [s]'].length; i++) {
+                    const scope = {};
+                    let equation_t = equation
+                    let j = 0;
+                    for (let key in yParameters) {
+                        if (equation.includes(key.toString())) {
+                            j++
+                            equation_t = equation_t.replace(new RegExp(escapeRegex(key), 'g'), `var${j}_${i}`)
+                            console.log(equation_t)
+                            Object.assign(scope, {[`var${j}_${i}`]: yParameters[key][i]});
+                        }                
+                    }
+                    result.push(math.evaluate(equation_t, scope));
+                }                
+                Object.assign(yParameters, {[new_parameter]: result})
+                displayParameters()
+            } catch (error) {
+                console.error("Invalid input:", error.message);
+                alert("Error: Invalid mathematical expression! Please try again.");
+            }
+            
+        }
+    })
+}
+//create myChart object
 function displaygraph(tValues, yValues, parameter) {
     let dsets = [];
     let ylimits = {};
@@ -338,4 +383,7 @@ function displaygraph(tValues, yValues, parameter) {
     });
 }
 
-
+//used to get rid of special characters in string so that they can be used in methods. 
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape regex special characters
+}
