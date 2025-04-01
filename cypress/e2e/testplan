@@ -24,6 +24,7 @@ TestSuite 2: Evertyhing shows up correctly when uploading csv.
     2c: object with y-variables exist equal to data from testdata.
     2d: label created for all y-variables.
     2e: checkbox created for all y-variables.
+    ef: button new parameter shows.
 
 
 TestSuite 3a: Graph(s) are shown correctly when y-variables are selected. Random variables selected
@@ -59,3 +60,24 @@ TestSuite 4: Graph(s) are shown correctly when display options are selected. (sc
     4a: schreenshot is equal to semi stacked testscreenshot.
     init7: select not stacked visual.
     4b: schreenshot is equal to not stacked testscreenshot.
+
+TestSuite 5: create new parameter works
+    init1: upload calculated new yParameter data.
+    init2: visit website.
+    init3: upload csv with test data.
+    init4: click new parameter button.
+    init5: give new name to parameter: var 1.
+    init6: give equation to var1: (3.14 + Battery voltage [21] * RPM [61]^Battery voltage [21])/2
+    5a: is var 1 visible as label and checkbox.
+    5b: Check if yParameterdata of var 1 is available and compare it with precalculated data. 
+    init7: click new parameter button.
+    init8: give new parameter name: (%^[&*)}
+    init9: give equation to (%^[&*)}: 0 - sqrt(var1)
+    5c: Is (%^[&*) visible as label and checkbox
+    5d: Check if yParameterdata of  (%^[&*)} is available and compare it with precalculated data.
+    init10: check boxes of var 1 and (%^[&*)}
+    5e: compare screenshots.
+
+    
+
+

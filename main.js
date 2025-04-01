@@ -42,7 +42,6 @@ document.getElementById("csvFile").addEventListener("change", async function(eve
     await getTime();   
     displayParameters();
     displayCreateParameterButton();
-    createCreateParameterEventListener();
 });
 
 //Read csv
@@ -100,6 +99,9 @@ function displayParameters() {
     oldParameters.forEach((oldParamter) => {
         oldParamter.remove();
     });
+    
+
+    //create new parameters
     if (JSON.stringify(yParameters) === '{}') {console.log('DisplayParamters returned'); return;} // check if jsonobject is empty. 
 
     for (const key in yParameters) {
@@ -144,12 +146,18 @@ function displayParameters() {
 }
 
 //display createParameterButton
+
 function displayCreateParameterButton()   {
-    const createParameterButtonBox = document.querySelector("#createParameterButtonBox")
-    const createParameterButton = document.createElement("button");
-    createParameterButton.textContent = 'new parameter';
-    createParameterButton.setAttribute('id', "createParameterButton");
-    createParameterButtonBox.appendChild(createParameterButton);
+    if (document.querySelector('#createParameterButton') !== null) {
+        return
+    } else {        
+        const createParameterButtonBox = document.querySelector("#createParameterButtonBox")
+        const createParameterButton = document.createElement("button");
+        createParameterButton.textContent = 'new parameter';
+        createParameterButton.setAttribute('id', "createParameterButton");
+        createParameterButtonBox.appendChild(createParameterButton);
+        createCreateParameterEventListener();
+    }
 }
 
 function createCreateParameterEventListener()    {
@@ -174,6 +182,7 @@ function createCreateParameterEventListener()    {
                             Object.assign(scope, {[`var${j}_${i}`]: yParameters[key][i]});
                         }                
                     }
+                    console.log(equation_t)
                     result.push(math.evaluate(equation_t, scope));
                 }                
                 Object.assign(yParameters, {[new_parameter]: result})
