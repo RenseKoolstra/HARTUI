@@ -55,6 +55,9 @@ describe('testsuite2', () => {
                     .find('input[type="checkbox"]')
                     .should('exist');
                 })             
+            })
+            .then(() => {
+                cy.get('#createParameterButton').should('be.visible')
             })       
         }); 
     })    
