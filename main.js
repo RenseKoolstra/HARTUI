@@ -3,6 +3,7 @@ const parameters = document.querySelector("#parameters");
 const simpleChart = document.querySelector("#simpleChart");
 const display = document.querySelector('#DisplayOptions');
 const lightdarkemoji = document.querySelector('#lightdarkemoji')
+const addParameter = document.querySelector('#calcModal')
 var displaymode = display.value;
 var csvAsJson = {};
 var t = {};
@@ -29,6 +30,12 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () 
     }
 });
 
+//add eventlisteners for all mathOperators
+const mathOperators = document.querySelectorAll('.mathOperator').forEach(mathOperator => {
+    mathOperator.addEventListener('click', () => {
+        document.getElementById('newParameterEquation').value +=  mathOperator.textContent
+    })
+})
 
 display.addEventListener("change", async function() {
     displaymode = display.value;
@@ -162,38 +169,62 @@ function displayCreateParameterButton()   {
 
 function createCreateParameterEventListener()    {
     document.getElementById('createParameterButton').addEventListener("click", () => {
-        const new_parameter = prompt("name of the new parameter");
-        const equation = prompt("equation of the new parameter.");
-        if (equation === null) {
-            console.log("No input given");
-        } else {
-            
-            try {
-                const result = [];
-                for (var i = 0; i < t['time [s]'].length; i++) {
-                    const scope = {};
-                    let equation_t = equation
-                    let j = 0;
-                    for (let key in yParameters) {
-                        if (equation.includes(key.toString())) {
-                            j++
-                            equation_t = equation_t.replace(new RegExp(escapeRegex(key), 'g'), `var${j}_${i}`)
-                            console.log(equation_t)
-                            Object.assign(scope, {[`var${j}_${i}`]: yParameters[key][i]});
-                        }                
-                    }
-                    console.log(equation_t)
-                    result.push(math.evaluate(equation_t, scope));
-                }                
-                Object.assign(yParameters, {[new_parameter]: result})
-                displayParameters()
-            } catch (error) {
-                console.error("Invalid input:", error.message);
-                alert("Error: Invalid mathematical expression! Please try again.");
-            }
-            
+        var newParameterName = document.getElementById('newParameterName').value = '';
+        var equation = document.getElementById('newParameterEquation').value = '';
+        const parameterbox = document.getElementById('calcUIleftBox')
+        //delete all old parameters
+        const oldcalcUIParameters = document.querySelectorAll(".calcUIparameter");
+        oldcalcUIParameters.forEach((oldcalcUIParameters) => {
+            oldcalcUIParameters.remove();
+        });
+        for (let key in yParameters) {
+            const new_parameter = document.createElement("p");
+            new_parameter.textContent = key;
+            new_parameter.classList.add('calcUIparameter')
+            parameterbox.appendChild(new_parameter)
+            new_parameter.addEventListener('click', () => {
+                document.getElementById('newParameterEquation').value +=  key
+            })
         }
-    })
+
+        addParameter.style.display = 'flex';
+        document.getElementById('submitNewParameter').addEventListener("click", () => {
+            newParameterName = document.getElementById('newParameterName').value;
+            equation = document.getElementById('newParameterEquation').value;
+            if (newParameterName === null || newParameterName === ''|| equation === null || equation === '') {
+                alert("No input given");
+                addParameter.style.display = 'none';
+                return;
+            } else {
+                try {
+                    const result = [];
+                    for (var i = 0; i < t['time [s]'].length; i++) {
+                        const scope = {};
+                        let equation_t = equation
+                        let j = 0;
+                        for (let key in yParameters) {
+                            if (equation.includes(key.toString())) {
+                                j++
+                                equation_t = equation_t.replace(new RegExp(escapeRegex(key), 'g'), `var${j}_${i}`)
+                                Object.assign(scope, {[`var${j}_${i}`]: yParameters[key][i]});
+                            }                
+                        }
+                        result.push(math.evaluate(equation_t, scope));
+                    }                
+                    Object.assign(yParameters, {[newParameterName]: result})
+                    
+                    displayParameters()
+                } catch (error) {
+                    console.error("Invalid input:", error.message);
+                    alert("Error: Invalid mathematical expression! Please try again.");
+                    addParameter.style.display = 'none';
+                    return;
+                }
+                
+            }
+            addParameter.style.display = 'none';
+        })
+    })        
 }
 //create myChart object
 function displaygraph(tValues, yValues, parameter) {
