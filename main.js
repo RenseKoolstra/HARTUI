@@ -167,6 +167,8 @@ function displayCreateParameterButton()   {
     }
 }
 
+
+//create eventlistener for create parameter
 function createCreateParameterEventListener()    {
     document.getElementById('createParameterButton').addEventListener("click", () => {
         var newParameterName = document.getElementById('newParameterName').value = '';
@@ -186,14 +188,22 @@ function createCreateParameterEventListener()    {
                 document.getElementById('newParameterEquation').value +=  key
             })
         }
+        addParameter.style.display = 'flex'; // show ui
+        //calculate equation
+        document.getElementById('submitNewParameter').addEventListener("click", createNewParameter)
+    })        
+}
 
-        addParameter.style.display = 'flex';
-        document.getElementById('submitNewParameter').addEventListener("click", () => {
-            newParameterName = document.getElementById('newParameterName').value;
+function createNewParameter() {
+    newParameterName = document.getElementById('newParameterName').value;
             equation = document.getElementById('newParameterEquation').value;
             if (newParameterName === null || newParameterName === ''|| equation === null || equation === '') {
                 alert("No input given");
                 addParameter.style.display = 'none';
+                document.getElementById('submitNewParameter').removeEventListener('click', createNewParameter)
+                return;
+            }else if (newParameterName in yParameters){
+                alert("Parameter name already exist");
                 return;
             } else {
                 try {
@@ -210,9 +220,13 @@ function createCreateParameterEventListener()    {
                             }                
                         }
                         result.push(math.evaluate(equation_t, scope));
-                    }                
+                    }
+                    //check if new parameter has strange numbers like inf or NAN and give a warning. The new parameter is still added and can be used.
+                    const hasInvalid = result.some(n => !Number.isFinite(n));
+                    if (hasInvalid) {
+                        alert("New parameter contains values that can't be displayed by the graph like inf or NAN. Check for possibility of divide by 0 or if datasets are used that didn't contain numbers.");
+                    }
                     Object.assign(yParameters, {[newParameterName]: result})
-                    
                     displayParameters()
                 } catch (error) {
                     console.error("Invalid input:", error.message);
@@ -223,8 +237,6 @@ function createCreateParameterEventListener()    {
                 
             }
             addParameter.style.display = 'none';
-        })
-    })        
 }
 //create myChart object
 function displaygraph(tValues, yValues, parameter) {
