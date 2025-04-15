@@ -412,20 +412,20 @@ function displaygraph(tValues, yValues, parameter) {
                                 return false; // abort
                             }
                         },
-                        mode: 'xy', // Enable panning on the x-axis
-                        threshold: 100, // Minimum distance to start panning (useful for touch devices)
-                        speed: 0.3, // Adjust pan speed (lower = slower)
+                        mode: settings.pan_mode, // Enable panning on the x-axis
+                        threshold: settings.pan_treshold, // Minimum distance to start panning (useful for touch devices)
+                        speed: settings.pan_speed, // Adjust pan speed (lower = slower)
                     },
                     zoom: {
                         wheel: {
                             enabled: true,
-                            speed: 0.1
+                            speed: settings.zoom_wheel_speed
                         },
                         pinch: {
                             enabled: true, // Enable pinch zooming on touch devices
-                            speed: 0.2
+                            speed: settings.zoom_pinch_speed
                         },
-                        mode: 'xy', // Zoom in/out on the x-axis                        
+                        mode: settings.zoom_mode, // Zoom in/out on the x-axis                        
                     }
                 }
             }       
