@@ -7,6 +7,7 @@ const display = document.querySelector('#DisplayOptions');
 const lightdarkemoji = document.querySelector('#lightdarkemoji')
 const addParameter = document.querySelector('#calcModal')
 
+
 //Backend variables
 var displaymode = display.value;
 var csvAsJson = {};
@@ -16,11 +17,18 @@ var datalist = [];
 var parameterlist = [];
 var myChart;
 var prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;  //lookup light dark settings of windows.
+var GPSJson = {};
+var map
+var verticalLineX = null
+const route_segment = []
+const speed = []
+let startMarker = null; // define globally or in the appropriate outer scope
+let isMouseDown = false;
 lightdarkemoji.textContent = prefersDarkScheme ? '🌙': '☀️';    //Set emoji of light dark mode to the one of windows setting
 
 //function that changes dark light mode
 function changelightdark() {
-prefersDarkScheme = prefersDarkScheme ? 0:1;
+    prefersDarkScheme = prefersDarkScheme ? 0:1;
     document.documentElement.style.setProperty('color-scheme', prefersDarkScheme ? "dark":"light");
     lightdarkemoji.textContent = prefersDarkScheme ? "🌙":"☀️";
     displaygraph(t['time [s]'], datalist, parameterlist);
@@ -49,7 +57,7 @@ display.addEventListener("change", async function() {
     displaygraph(t['time [s]'], datalist, parameterlist);
 })
 
-//main program
+//upload timedata
 document.getElementById("csvFile").addEventListener("change", async function(event) {
     const file = event.target.files[0];
     csvAsJson = await readCsv(file);
@@ -57,6 +65,17 @@ document.getElementById("csvFile").addEventListener("change", async function(eve
     displayParameters();
     displayCreateParameterButton();
 });
+
+//upload gpsdata
+document.getElementById("gpsFile").addEventListener("change", async function(event) {
+    const file = event.target.files[0];
+    GPSJson = await readGPSCsv(file); 
+    await create_map();
+    await create_targets();
+    await create_route();
+});
+
+
 
 //Read csv
 async function readCsv(file)   {
@@ -149,8 +168,7 @@ async function getTime()   {
             
                 if (checkbox.checked)  {
                     datalist.push(yParameters[checkbox.getAttribute("value")]);
-                    parameterlist.push(checkbox.getAttribute("value"));
-                    
+                    parameterlist.push(checkbox.getAttribute("value")); 
                 }
 
             })
@@ -284,6 +302,24 @@ function displaygraph(tValues, yValues, parameter) {
         }
     }
 
+    const plugin = {
+        id: 'verticalLine',
+        afterDraw(chart) {
+            if (verticalLineX !== null) {
+                const ctx = chart.ctx;
+                const chartArea = chart.chartArea;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(verticalLineX, chartArea.top);
+                ctx.lineTo(verticalLineX, chartArea.bottom);
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+    };
 
     for (i=0; i < yValues.length; i++) {
         dsets[i] = {
@@ -391,6 +427,7 @@ function displaygraph(tValues, yValues, parameter) {
             responsive: true,
             animation: false,
             scales : multiplescales,
+            
             plugins: {
                 legend: {
                     labels: {color: textcolor}
@@ -427,13 +464,182 @@ function displaygraph(tValues, yValues, parameter) {
                         },
                         mode: settings.zoom_mode, // Zoom in/out on the x-axis                        
                     }
-                }
-            }       
-        },        
+                }                
+            },     
+        },
+        plugins: [plugin]          
+    });
+
+    myChart.canvas.addEventListener('mousedown', (event) => {
+    const rect = simpleChart.getBoundingClientRect();
+    const y = event.clientY - rect.top;
+    if (y >= 650) {
+        isMouseDown = true;
+        handleMouseEvent(event);
+    }
+    });
+
+    myChart.canvas.addEventListener('mousemove', (event) => {
+        if (isMouseDown) {
+            handleMouseEvent(event);
+        }
+    
+    });
+
+    myChart.canvas.addEventListener('mouseup', () => {
+        if (isMouseDown) {
+            isMouseDown = false;
+        }
     });
 }
+
+
+
+function handleMouseEvent(event) {
+
+    const points = myChart.getElementsAtEventForMode(
+        event,
+        'index',
+        { intersect: false },
+        true
+    );
+
+    if (points.length > 0) {
+        const index = points[0].index;
+        const label = myChart.data.labels[index];
+        create_mark(label); 
+
+        verticalLineX = event.offsetX; // event.x may not align on all browsers
+        myChart.update();
+    }
+}
+
 
 //used to get rid of special characters in string so that they can be used in methods. 
 function escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape regex special characters
 }
+
+//Read gps csv
+async function readGPSCsv(file)   {
+    return new Promise((resolve, reject) => {
+        if (!file) return;
+        
+        const reader = new FileReader();
+        const Json = {}
+        reader.onload = async function(e) {
+            const text = e.target.result;
+            const lines = text.split("\n").map(line => line.trim()).filter(line => line); // Remove empty lines
+            if (lines.length < 2) return; // Ensure we have at least a header + one row
+
+            const headers = lines[0].split(",").map(header => header.trim());
+            
+
+            // Initialize keys with empty arrays
+            headers.forEach(header => {
+                Json[header] = [];
+            });
+
+            // Process each row
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(",").map(value => value.trim());
+                
+                // Add each value to its corresponding key
+                headers.forEach((header, index) => {
+                    Json[header].push((parseFloat(values[index]))); 
+                });
+            }
+            //const initTime = Json['UTC Time'][0];
+            
+            Json['UTC Time'] = Array.from({ length:Json['UTC Time'].length}, (_, i) => (i + 1)/10);
+            resolve(Json)
+        };
+        reader.onerror = (error) => reject(error);
+        reader.readAsText(file);
+    });
+}
+
+async function create_map() {
+    map = L.map('map').setView([GPSJson['Latitude'][0], GPSJson['Longitude'][0]], 13);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+}
+async function create_targets()   {
+    //define start marker
+
+    var startIcon = L.icon({
+        iconUrl: 'Images/startflag.png',
+        iconSize:     [19, 37], // size of the icon
+        iconAnchor:   [7, 37], // point of the icon which will correspond to marker's location
+        popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+    });
+    
+    var finishIcon = L.icon({
+        iconUrl: 'Images/finishflag.png',
+        iconSize:     [19, 37], // size of the icon
+        iconAnchor:   [6, 37], // point of the icon which will correspond to marker's location
+        popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
+    });
+    var startMarker = L.marker([GPSJson['Latitude'][0], GPSJson['Longitude'][0]], {icon: startIcon}).addTo(map);
+    console.log(startMarker)
+    startMarker.bindPopup("<b>Start</b>")
+    var stopMarker = L.marker([GPSJson['Latitude'].at(-1), GPSJson['Longitude'].at(-1)], {icon: finishIcon}).addTo(map);
+    stopMarker.bindPopup("<b>End</b>")
+}
+
+async function create_mark(time)   {
+    if (startMarker) {
+         map.removeLayer(startMarker); // remove it from the map
+    }
+    
+    for (let i = 0; i < GPSJson['UTC Time'].length; i++)  {
+        console.log(GPSJson['UTC Time'][i])
+        console.log(time)
+        if (time < GPSJson['UTC Time'][i])  {
+            
+            startMarker = L.marker([GPSJson['Latitude'][i], GPSJson['Longitude'][i]]).addTo(map);
+            startMarker.bindPopup(`<b>${time} s</b>`)
+            return
+            }
+        }        
+    }
+    
+
+async function create_route() {
+    
+    for (let i=0; i<GPSJson['Latitude'].length - 1; i++) {
+        let point1 = [GPSJson['Latitude'][i], GPSJson['Longitude'][i]]
+        let point2 = [GPSJson['Latitude'][i+1], GPSJson['Longitude'][i+1]]
+        route_segment.push([point1, point2]);
+        speed.push(distance(point1, point2)/(GPSJson['UTC Time'][i+1] - GPSJson['UTC Time'][i])*3.6)
+    }
+    const minSpeed = 0
+    const maxSpeed = Math.max(...speed)
+       
+    for (let i=0; i<route_segment.length; i++) {
+        var polyline= L.polyline(route_segment[i], {color: rgbColor(speed[i]/(maxSpeed - minSpeed))}).addTo(map);
+    }
+    
+
+}
+
+function fclColor(value){
+  var h = (1.0 - value) * 240
+  return "hsl(" + h + ", 100%, 50%)";
+}
+
+function rgbColor(value){
+    var r =  Math.round(value *255)
+    var b = Math.round((1-value) *255)
+    return `rgb(${r}, 0, ${b})`
+}
+
+function distance(point1, point2) {
+    var degToRad = Math.PI / 180;
+    R = 6371000;// meters
+    return R * degToRad * Math.sqrt(Math.pow(Math.cos(point1[0] * degToRad ) * (point1[1] - point2[1]) , 2) + Math.pow(point1[0] - point2[0], 2));
+}
+

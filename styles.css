@@ -32,6 +32,7 @@ main {
     justify-content: space-around;
     flex-wrap: nowrap;
     flex-grow: 1; /* Takes up remaining space */
+    min-height: 800px; /* VERY important */
 }
 
 /* footer {
@@ -42,12 +43,27 @@ main {
 } */
 
 #leftbox {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+#controlPanel {
     margin: 10px;
     background-color: light-dark( rgb(225, 225, 225), rgb(25, 25, 25));
     border: 3px solid light-dark(rgb(180, 180, 180), rgb(70, 70, 70));
     border-radius: 10px;
     display: flex;
     flex-direction: column;
+    flex-grow: 2;
+    min-height: 0;  /* Allow shrinking inside flex parent */
+}
+
+#gpsmap {
+  margin: 10px;
+  background-color: light-dark( rgb(225, 225, 225), rgb(25, 25, 25));
+  border: 3px solid light-dark(rgb(180, 180, 180), rgb(70, 70, 70));
+  border-radius: 10px;
+  height: 306px;
 }
 
 #rightbox {
@@ -58,7 +74,7 @@ main {
     flex-grow: 1; /* Allows it to fill space properly */
 }
 
-#choosecsv {
+.choosecsv {
     padding: 20px 10px;
 }
 
@@ -75,6 +91,9 @@ main {
 
 #parameters {
     margin: 20px 10px;
+    overflow-y: auto; /* Enables scrolling when content overflows */  
+    flex-grow: 1;
+    min-height: 0;  /* Allow shrinking inside flex parent */
 }
 
 .parameter {
@@ -93,12 +112,11 @@ main {
 }
 
 .parameter_check{
-    margin: 0;
+    margin: 0 10px;
     padding: 0;
 }
 
 #timeGraph{
-    /* background-color: aquamarine; */
     width: 99%;
     height: 99%;
 }

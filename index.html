@@ -8,16 +8,25 @@
     <title>HARTUI</title>
     <link rel="stylesheet" href="./styles.css">
     <link rel="icon" href="./Images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
   </head>
   <body>
     <Header>
-        
         <h1>Welcome to HartUI</h1>
     </header>
     <main>
         <div id = "leftbox">
-            <div id = "choosecsv">
+          <div id = "controlPanel">
+            <div class = "choosecsv">
                 <input type="file" id="csvFile" accept=".csv">
+            </div>
+            <div class = "choosecsv">
+                <input type="file" id="gpsFile" accept=".csv">
             </div>
             <div id = "display_options">
               <label for="displayoptions">display options:</label>
@@ -27,13 +36,18 @@
                 <option value="semi stacked">semi stacked</option>
                 <option value="fully stacked">fully stacked</option>
               </select> 
-              <span id = lightdarkemoji> </span>
+              <span id = "lightdarkemoji"> </span>
             </div>
             <div id = "parameters">
               
             </div>
             <div id = "createParameterButtonBox">
+      
             </div>
+          </div>
+          <div id = "gpsmap">
+              <div style="height: 300px;" id="map"></div>
+          </div>
         </div>
         <div id = "rightbox">
             <div id = "timeGraph">
