@@ -33,10 +33,16 @@ describe('testsuite1', () => {
 
     //1e: upload csv textbox exist.
 
-    it('check csv textbox', () => {
-        cy.get('#choosecsv input').should(($chooosecsv) => {
-            expect($chooosecsv).to.exist;
-            expect($chooosecsv).to.have.attr('type', 'file')
+    it('check data csv textbox', () => {
+        cy.get('.choosecsv #csvFile').should(($csv) => {
+            expect($csv).to.exist;
+            expect($csv).to.have.attr('type', 'file')
+        }) 
+    })
+    it('check gps csv textbox', () => {
+        cy.get('.choosecsv #gpsFile').should(($gps) => {
+            expect($gps).to.exist;
+            expect($gps).to.have.attr('type', 'file')
         }) 
     })
     /*1f: change display dropdownbox exist with options:

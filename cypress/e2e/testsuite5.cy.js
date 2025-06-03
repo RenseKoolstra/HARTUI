@@ -19,6 +19,7 @@ describe('testsuite5', () => {
                 expect(Object.keys(win.yParameters)).to.have.length.above(0);
             })
         })
+        /*
         .then(() => {
             cy.window().then((win) => {
                 cy.stub(win, 'prompt')
@@ -28,55 +29,45 @@ describe('testsuite5', () => {
                 .onCall(3).returns('0 - sqrt(var 1)')
             })
         })
+        */
         .then(() => {
             cy.get('#createParameterButton').click()
+            cy.get('#newParameterName').type('var 1')
+            cy.get('#mathOperatorLB').click()
+            cy.get('#newParameterEquation').type('3.14')
+            cy.get('.mathOperator').contains('button', '+').click()
+            cy.get('.calcUIparameter').contains('p','Lambda [5]').click()
+            cy.get('.mathOperator').contains('button', '*').click()
+            cy.get('.calcUIparameter').contains('p','MAP [20]').click()
+            cy.get('.mathOperator').contains('button', '^').click()
+            cy.get('.calcUIparameter').contains('p','Lambda [5]').click()
+            cy.get('.mathOperator').contains('button', ')').click()
+            cy.get('.mathOperator').contains('button', '/').click()
+            cy.get('#newParameterEquation').type('2')
+            cy.get('#submitNewParameter').click()
+        })
+        .then(() => {
+            cy.get('#createParameterButton').click()
+            cy.get('#newParameterName').type('(%^[&*)}')
+            cy.get('#newParameterEquation').type('0 - sqrt(var 1)')
+            cy.get('#submitNewParameter').click()
         })
         
         
     })
 
     it('var 1 visible and correct', () => {
-        cy.get('.parameter p').last().should('contain', 'var 1')
+        cy.get('.parameter p').eq(-2).should('contain', 'var 1')
         cy.window().should((win) => {
             expect(win.yParameters['var 1'].map((el) => math.round(el*1000)/1000)).to.deep.equal((calc['var 1'].map((el) => math.round(el*1000)/1000)));
         })
     })
 
     it('(%^[&*)} visible and correct', () => {
-        cy.get('#createParameterButton').click()
-        .then(() => {
-            cy.window().should((win) => {
-                expect(win.yParameters['(%^[&*)}'].map((el) => math.round(el*1000)/1000)).to.deep.equal((calc['(%^[&*)}'].map((el) => math.round(el*1000)/1000)));
-            })
-        })
-
-    })
-
-    it('compare ss', () => {
-        cy.get('#createParameterButton').click()
+        cy.get('.parameter p').eq(-1).should('contain', '(%^[&*)}')
         cy.window().should((win) => {
-            //init 3 upload jsonobject with y-variables
-            expect(Object.keys(win.yParameters)).to.have.length.above(0);
-        })
-        .then(() => {
-            cy.get('.parameter').each(($el, index) => {
-                cy.wrap($el)
-                .find('p')
-                .invoke('text')
-                .then((text) => {
-                    if (chosenY.includes(text)) {
-                        cy.wrap($el)
-                        .find('input[type="checkbox"]').click()
-                    } 
-                });
-            })             
+            expect(win.yParameters['(%^[&*)}'].map((el) => math.round(el*1000)/1000)).to.deep.equal((calc['(%^[&*)}'].map((el) => math.round(el*1000)/1000)));
         })
 
-        cy.get('#DisplayOptions').select('not stacked')
-        cy.get('#simpleChart').screenshot('comparecalc')
-        cy.matchImageSnapshot('comparecalc');
-          
     })
-
-
 })

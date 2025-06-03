@@ -19,7 +19,7 @@ var myChart;
 var prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)").matches;  //lookup light dark settings of windows.
 var GPSJson = {};
 var map
-var verticalLineX = null
+var selectedX = null
 const route_segment = []
 const speed = []
 let startMarker = null; // define globally or in the appropriate outer scope
@@ -305,12 +305,12 @@ function displaygraph(tValues, yValues, parameter) {
     const plugin = {
         id: 'verticalLine',
         afterDraw(chart) {
-            if (verticalLineX !== null) {
+            if (selectedX !== null) {
                 const ctx = chart.ctx;
                 const chartArea = chart.chartArea;
-
                 ctx.save();
                 ctx.beginPath();
+                var verticalLineX = chart.scales['x'].getPixelForValue(value = selectedX);
                 ctx.moveTo(verticalLineX, chartArea.top);
                 ctx.lineTo(verticalLineX, chartArea.bottom);
                 ctx.strokeStyle = 'red';
@@ -448,6 +448,7 @@ function displaygraph(tValues, yValues, parameter) {
                                 || point.y < area.top + h10 || point.y > area.bottom - h10) {
                                 return false; // abort
                             }
+                            myChart.update();
                         },
                         mode: settings.pan_mode, // Enable panning on the x-axis
                         threshold: settings.pan_treshold, // Minimum distance to start panning (useful for touch devices)
@@ -462,7 +463,10 @@ function displaygraph(tValues, yValues, parameter) {
                             enabled: true, // Enable pinch zooming on touch devices
                             speed: settings.zoom_pinch_speed
                         },
-                        mode: settings.zoom_mode, // Zoom in/out on the x-axis                        
+                        mode: settings.zoom_mode, // Zoom in/out on the x-axis    
+                        onZoomStart() {
+                            myChart.update();
+                        }                    
                     }
                 }                
             },     
@@ -509,7 +513,8 @@ function handleMouseEvent(event) {
         const label = myChart.data.labels[index];
         create_mark(label); 
 
-        verticalLineX = event.offsetX; // event.x may not align on all browsers
+        selectedX = index;
+        //verticalLineX = event.offsetX; // event.x may not align on all browsers
         myChart.update();
     }
 }
@@ -546,18 +551,32 @@ async function readGPSCsv(file)   {
                 
                 // Add each value to its corresponding key
                 headers.forEach((header, index) => {
-                    Json[header].push((parseFloat(values[index]))); 
+                    if (header !== 'UTC Time') {
+                        Json[header].push(parseFloat(values[index])); 
+                    }
+                    else{
+                        Json[header].push(values[index]); 
+                    }
                 });
             }
-            //const initTime = Json['UTC Time'][0];
-            
-            Json['UTC Time'] = Array.from({ length:Json['UTC Time'].length}, (_, i) => (i + 1)/10);
+            const initTime = UTCToS(Json['UTC Time'][0].toString());
+            //Json['UTC Time'] = Array.from({ length:Json['UTC Time'].length}, (_, i) => UTCToS(Json['UTC Time'][i].toString()) - initTime);                    //uncomment this and comment the next line when the gps is set to 10 hz
+            Json['UTC Time'] = Array.from({ length:Json['UTC Time'].length}, (_, i) => (i)/10);                                                                 //comment this and uncomment the previous line when the gps is set to 10 hz
             resolve(Json)
         };
         reader.onerror = (error) => reject(error);
         reader.readAsText(file);
     });
 }
+
+function UTCToS(UTC) {
+    const ms = parseInt(UTC.slice(7))
+    const s = parseInt(UTC.slice(4, 6))
+    const m = parseInt(UTC.slice(2, 4))
+    const h = parseInt(UTC.slice(0, 2))
+    return (h*3600 + m*60 + s + ms/1000)
+}
+
 
 async function create_map() {
     map = L.map('map').setView([GPSJson['Latitude'][0], GPSJson['Longitude'][0]], 13);
@@ -584,7 +603,6 @@ async function create_targets()   {
         popupAnchor:  [0, 0] // point from which the popup should open relative to the iconAnchor
     });
     var startMarker = L.marker([GPSJson['Latitude'][0], GPSJson['Longitude'][0]], {icon: startIcon}).addTo(map);
-    console.log(startMarker)
     startMarker.bindPopup("<b>Start</b>")
     var stopMarker = L.marker([GPSJson['Latitude'].at(-1), GPSJson['Longitude'].at(-1)], {icon: finishIcon}).addTo(map);
     stopMarker.bindPopup("<b>End</b>")
@@ -595,9 +613,8 @@ async function create_mark(time)   {
          map.removeLayer(startMarker); // remove it from the map
     }
     
+    
     for (let i = 0; i < GPSJson['UTC Time'].length; i++)  {
-        console.log(GPSJson['UTC Time'][i])
-        console.log(time)
         if (time < GPSJson['UTC Time'][i])  {
             
             startMarker = L.marker([GPSJson['Latitude'][i], GPSJson['Longitude'][i]]).addTo(map);
@@ -620,6 +637,8 @@ async function create_route() {
     const maxSpeed = Math.max(...speed)
        
     for (let i=0; i<route_segment.length; i++) {
+        console.log('polyline created')
+        console.log(fclColor(speed[i]/(maxSpeed - minSpeed)))
         var polyline= L.polyline(route_segment[i], {color: rgbColor(speed[i]/(maxSpeed - minSpeed))}).addTo(map);
     }
     
@@ -643,3 +662,4 @@ function distance(point1, point2) {
     return R * degToRad * Math.sqrt(Math.pow(Math.cos(point1[0] * degToRad ) * (point1[1] - point2[1]) , 2) + Math.pow(point1[0] - point2[0], 2));
 }
 
+//change
