@@ -1,4 +1,7 @@
-const chosenY = ['Intake air temp [17]', 'MAP [20]', 'Oil Pressure [804]'] 
+
+
+
+const chosenY = ['Intake air temp [17]', 'RPM [61]', 'Oil Pressure [804]'] 
 //let SSfullysctacked;
 describe('testsuite4', () => {
     beforeEach(() => {
@@ -28,17 +31,14 @@ describe('testsuite4', () => {
     })
     it('sreenshot fully stacked', () => {
         cy.get('#DisplayOptions').select('fully stacked')
-        cy.get('#simpleChart').screenshot('fully stacked')
-        cy.matchImageSnapshot('fully stacked');
+        cy.get('body').matchImageSnapshot('fully stacked');
     })
     it('sreenshot semi stacked', () => {
         cy.get('#DisplayOptions').select('semi stacked')
-        cy.get('#simpleChart').screenshot('semi stacked')
-        cy.matchImageSnapshot('semi stacked');
+        cy.get('body').matchImageSnapshot('semi stacked');
     }) 
     it('sreenshot not stacked', () => {
         cy.get('#DisplayOptions').select('not stacked')
-        cy.get('#simpleChart').screenshot('not stacked')
-        cy.matchImageSnapshot('not stacked');
+        cy.get('body').matchImageSnapshot('not stacked');
     })    
 })
